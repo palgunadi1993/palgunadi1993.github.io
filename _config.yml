@@ -3,7 +3,7 @@ description: Blogging about stuffs that I concern about
 meta_description: "My sharing knowledge pages, Blogging about stuffs"
 
 markdown: kramdown
-highlighter: pygments
+highlighter: rouge
 logo: false
 paginate: 15
 baseurl: 'https://palgunadi1993.github.io'
