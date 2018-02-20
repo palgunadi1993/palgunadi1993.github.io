@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>Kadek Palgunadi's Blog - Blogging about stuffs that I concern about</title>
+    <meta name="description" content="My sharing knowledge pages, Blogging about stuffs" />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <!-- Customisation  -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+
+</head>
+<body class="home-template">
+
+    <header class="main-header post-head no-cover">
+    <nav class="main-nav  clearfix">
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post">
+
+        <header class="post-header">
+            <h1 class="post-title">User Manual SIMULPS12 (Bahasa Indonesia)</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="2017-02-20">20 Feb 2017</time>
+                
+                    on software and manual
+                
+            </section>
+        </header>
+
+<!--         <header class="post-header">
+            <a id="blog-logo" href="http://localhost:4000">
+                
+                    <span class="blog-title">Kadek Palgunadi's Blog</span>
+                
+            </a>
+        </header> -->
+
+        <!-- <span class="post-meta">
+            <time datetime="2017-02-20">20 Feb 2017</time>
+            
+                on software and manual
+            
+        </span> -->
+
+        <!-- <h1 class="post-title">User Manual SIMULPS12 (Bahasa Indonesia)</h1> -->
+
+        <section class="post-content">
+            <blockquote>
+  <p><strong><em>disclaimer</em></strong> : Ini merupakan tutorial cara menggunakan software simulps12.f (yang sudah di modifikasi) dan mempersiapkan data input yang akan digunakan pada simulps12.f. Jika menggunakan software ini jangan lupa untuk mensitasi (Evans, J.R., Eberhart-Phillips, D., Thurber, C.H., 1994. User’s Manual for SIMULPS12 for imaging VP and VP/VS: a Derivative of the Thurber Tomographic Inversion SIMUL3 for Local Earthquakes and Explosions. US Geological Survey Open File Report OFR 94-431, p. 101.)<a href="https://pubs.usgs.gov/of/1994/0431/report.pdf">link</a></p>
+</blockquote>
+
+<blockquote>
+  <p>Sebelum memulai menjalan program ini, silahkan menginstall beberapa <em>dependecies</em> dari <em>python library</em> yang diantaranya: <a href="https://pypi.python.org/pypi/pyproj?">pyproj</a>, numpy, dan beberapa library standar python2/python3</p>
+</blockquote>
+
+<p>Sebelum memulai mempersiapkan data input terlebih dahulu silahkan <em>download</em> <code>simulps12.f</code> dan file pendukungnya (<code>simulps_common.inc</code> dan <code>velfile.33tq1c</code>) yang telah saya <strong>modifikasi</strong> beberapa fungsinya sehingga dapat digunakan pada <em>modern</em> Linux pada tautan berikut ini.</p>
+<ul>
+  <li><a href="/assets/documents/simulps12.f">simulps12.f</a></li>
+  <li><a href="http://localhost:4000/assets/documents/simulps_common.inc">simulps_common.inc</a></li>
+  <li><a href="http://localhost:4000/assets/documents/velfile.33tq1c">velfile.33tq1c</a></li>
+</ul>
+
+<p>Ketiga file tersebut harus disimpan pada satu folder yang sama untuk memudahkan proses <em>compiling</em>. File <code>simulps12.f</code> merupakan program utama yang berisi semua algoritma dan proses <em>local earthquakes tomography</em> dalam bahasa <code>fortran77</code>, sedangkan <code>simulps_common.inc</code> merupakan parameter-parameter <em>grid-nodes</em> dan banyaknya stasiun serta gempa maksimum pada input. File ini (<code>simulps_common.inc</code>) dapat diedit sesuai dengan kebutuhan pengguna.</p>
+
+<h3 id="pembuatan-file-earthqdat">Pembuatan file <code>earthq.dat</code></h3>
+
+<p>Selanjutnya akan saya jelaskan bagaimana untuk membuat file input serta meng-<em>compile</em> pada sistem linux-mac juga sepertinya juga bisa- (non-windows). Pertama-tama persiapkanlah data hasil penentuan lokasi gempa seperti pada contoh berikut ini:</p>
+
+<table>
+	<tr><td>yearmonthdayhourminutes</td><td>year-month-day</td><td>hour</td><td>minutes</td><td>seconds (origin time)</td><td>UTMY(km)</td><td>UTMX(km)</td><td>depth(km)</td></tr>
+	<tr><td>201810142252</td><td>2018-10-14</td><td>22</td><td>52</td><td>27.001</td><td>7203.24500</td><td>589.305</td><td>000.1234
+	</td></tr>
+	<tr><td>201810152011</td><td>2018-10-15</td><td>20</td><td>11</td><td>46.460</td><td>7200.15900</td><td>588.953</td><td>015.2345
+	</td></tr>
+	<tr><td>201810161421</td><td>2018-10-16</td><td>14</td><td>21</td><td>23.387</td><td>7188.16700</td><td>500.398</td><td> -3.3456</td></tr>
+
+</table>
+
+<p>Namakan file diatas dengan <code>origin_time.txt</code> tanpa menyertai <em>header</em> file.</p>
+
+<table><tr><td>Num Event</td><td>yearmonthdayhourminutes</td><td>station</td><td>year</td><td>month</td><td>day</td><td>hours</td><td>minutes</td><td>arrival P(s)</td><td>arrival S(s)</td></tr><tr><td>1</td><td>1210142052</td><td>B21</td><td>2012</td><td>10</td><td>14</td><td>20</td><td>52</td><td>28.09</td><td>28.851</td></tr><tr><td>1</td><td>1210142052</td><td>B22</td><td>2012</td><td>10</td><td>14</td><td>20</td><td>52</td><td>28.344</td><td>29.340</td></tr><tr><td>1</td><td>1210142052</td><td>B23</td><td>2012</td><td>10</td><td>14</td><td>20</td><td>52</td><td>28.434</td><td>29.449</td></tr><tr><td>2</td><td>1210152111</td><td>B18</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>49.999</td><td>52.622</td></tr><tr><td>2</td><td>1210152111</td><td>SP1</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>50.043</td><td>52.569</td></tr><tr><td>2</td><td>1210152111</td><td>B21</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>50.121</td><td>52.533</td></tr><tr><td>2</td><td>1210152111</td><td>B23</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>50.358</td><td>52.962</td></tr><tr><td>2</td><td>1210152111</td><td>B09</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>51.247</td><td>54.722</td></tr></table>
+
+<p>Namakan file diatas dengan nama file <code>arrival_time.txt</code>. Data di atas merupakan data <em>dummy</em>.</p>
+
+<p>Setelah menyimpan kedua files tersebut, silahkan untuk menjalankan <em>code</em> dibawah ini:
+<strong>catatan</strong>: untuk perubahan lokasi UTM48S dapat dilakukan dengan melihat <a href="http://spatialreference.org/ref/epsg/">disini</a>.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">pyproj</span>
+
+<span class="c1">## Fungsi yang berfungsi untuk konversi koordinat dari utm ke longitude lattitude</span>
+<span class="k">def</span> <span class="nf">konversi</span><span class="p">(</span><span class="n">utmx</span><span class="p">,</span><span class="n">utmy</span><span class="p">):</span>
+    <span class="n">wgs84</span><span class="o">=</span><span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="s2">&quot;+init=EPSG:4326&quot;</span><span class="p">)</span> 
+    <span class="n">UTM48S</span><span class="o">=</span><span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="s2">&quot;+init=EPSG:32748&quot;</span><span class="p">)</span> <span class="c1">## Khusus untuk area 48S, jika ingin mengubah daerah lain silahkan</span>
+    <span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">UTM48S</span><span class="p">,</span> <span class="n">wgs84</span><span class="p">,</span> <span class="n">utmx</span><span class="p">,</span> <span class="n">utmy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span>
+
+<span class="c1">## Importing file dari file txt yang telah dibuat sebelumnya</span>
+<span class="n">fileinput</span> <span class="o">=</span> <span class="s1">&#39;/path/of/this/file/origin_time.txt&#39;</span>
+<span class="n">fileinput2</span> <span class="o">=</span> <span class="s1">&#39;/path/of/this/file/arrival_time.txt&#39;</span>
+
+<span class="c1">## Membaca file origin_time.txt dan menyimpannya dalam variabel baris</span>
+<span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileinput</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">baris</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">baris</span><span class="p">)):</span>
+	<span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1">## Membaca file arrival_time.txt dan menyimpan dalam variabel baris2</span>
+<span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fileinput2</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">baris2</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">baris2</span><span class="p">)):</span>
+	<span class="n">baris2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">baris2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1">## Nama file input earthq.dat dan alamat tempat menyimpannya</span>
+<span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/next/process/travel_time.txt&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">latlon</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/next/process/hypocenter.txt&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="n">station</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/next/process/stations.dat&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+<span class="c1">## inisiasi looping</span>
+<span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">jj</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">xx</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">baris2</span><span class="p">)):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">tahun</span> <span class="o">=</span> <span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">181</span><span class="p">:</span>
+        <span class="n">tahun_latlon</span> <span class="o">=</span> <span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">utmx</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">6</span><span class="p">])</span> <span class="c1">## faktor 1000 karena ingin merubah UTM dari km ke m</span>
+        <span class="n">utmy</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">5</span><span class="p">])</span> <span class="c1">## faktor 1000 karena ingin merubah UTM dari km ke m</span>
+        <span class="n">lat_lon</span> <span class="o">=</span> <span class="n">konversi</span><span class="p">(</span><span class="n">utmx</span><span class="p">,</span><span class="n">utmy</span><span class="p">)</span>  <span class="c1">## konversi variabel koordinat</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">lat_lon</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lon_men</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">lon</span><span class="p">))</span><span class="o">*</span><span class="mi">60</span>  
+        <span class="n">lat</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">lat_lon</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">lat_men</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span><span class="o">*</span><span class="mi">60</span>
+        
+        <span class="c1">## Proses seleksi dan pembuatan file</span>
+        <span class="k">if</span> <span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;99.99&#39;</span> <span class="ow">or</span> <span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">9</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;99.99&#39;</span><span class="p">:</span> <span class="c1">## mengabaikan fase P dan S yang tidak ada nilainya.</span>
+                <span class="k">continue</span> 
+        <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">7</span><span class="p">]):</span>
+            <span class="n">tp_to</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">ts_to</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">ts_tp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">8</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tp_to</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span> <span class="o">+</span> <span class="mi">60</span>
+            <span class="n">ts_to</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span> <span class="o">+</span> <span class="mi">60</span>
+            <span class="n">ts_tp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">8</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tahun</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> 0 </span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">tp_to</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">ts_tp</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">1</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">latlon</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tahun_latlon</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="n">tahun_latlon</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="n">tahun_latlon</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="n">lat_men</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lon</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="n">lon_men</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">7</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>        
+            <span class="n">station</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">xx</span> <span class="o">+=</span> <span class="mi">1</span>             
+            <span class="n">jj</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tahun</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> 0 </span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">tp_to</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">ts_tp</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">jj</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">latlon</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tahun_latlon</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="n">tahun_latlon</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="n">tahun_latlon</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="n">lat_men</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lon</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="n">lon_men</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="nb">float</span><span class="p">(</span><span class="n">baris</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">7</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>        
+            <span class="n">station</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">xx</span> <span class="o">+=</span> <span class="mi">1</span>             
+            <span class="n">jj</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tahun</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">7</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> 0 </span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">tp_to</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">ts_tp</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">station</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="n">baris2</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+<span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">latlon</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">station</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
+
+<p>Program diatas dapat di <em>copy</em> kedalam IDE python2/python3 yang anda miliki. Selanjutnya anda akan membuat file input <code>simulps12.f</code> yaitu <code>earthq.dat</code>. Ketiga file diatas akan digunakan sebagai input pembuatan <code>earthq.dat</code>. Untuk membuat file <code>earthq.dat</code> bisa dengan menjalankan program dibawah ini.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="c1">## import origin time</span>
+<span class="n">fileinput</span> <span class="o">=</span> <span class="s1">&#39;/path/to/next/process/hypocenter.txt&#39;</span>
+
+<span class="c1">## Kita namakan dengan variabel location</span>
+<span class="n">location</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fileinput</span><span class="p">)</span>
+
+<span class="c1">## import file travel_time.txt</span>
+<span class="n">input_arrival</span> <span class="o">=</span> <span class="s1">&#39;/path/to/next/process/travel_time.txt&#39;</span>
+<span class="n">input_arrival</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_arrival</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">arrival</span> <span class="o">=</span> <span class="n">input_arrival</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arrival</span><span class="p">)):</span>
+    <span class="n">arrival</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arrival</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">input_arrival</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1">## import file stations.txt</span>
+<span class="n">file_stations</span> <span class="o">=</span> <span class="s1">&#39;/path/to/next/process/stations.dat&#39;</span>
+<span class="n">station</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">file_stations</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+<span class="c1">## Nama file output (earthq.dat)</span>
+<span class="n">fidP</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;earthq.dat&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+<span class="n">year_mon_day</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">hours_minutes</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">sec</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">latdeg</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">latmin</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">longdeg</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">longmin</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">6</span><span class="p">]</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">location</span><span class="p">[:,</span><span class="mi">7</span><span class="p">]</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">location</span> <span class="p">[:,</span><span class="mi">8</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">event</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arrival</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">p</span><span class="p">])</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="n">event</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%5d</span><span class="s1"> </span><span class="si">%s</span><span class="s1">  </span><span class="si">%s%6.2f</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="si">%.2f%7.2f</span><span class="s1">   </span><span class="si">%.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">year_mon_day</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="n">hours_minutes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">sec</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">latdeg</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="n">latmin</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">longdeg</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="n">longmin</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">depth</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Y</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">6</span><span class="p">])</span> <span class="o">!=</span> <span class="mf">99.990</span><span class="p">:</span>
+        <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%1c%1c%1i%6.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">6</span><span class="p">])))</span>
+        <span class="n">h</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">7</span><span class="p">])</span> <span class="o">!=</span> <span class="mf">99.990</span><span class="p">:</span>
+        <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%1c%1c%1i</span><span class="s1"> </span><span class="si">%5.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">z</span><span class="p">],</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">7</span><span class="p">])))</span>
+        <span class="n">h</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">z</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][:])</span><span class="o">==</span><span class="mi">8</span><span class="p">:</span>
+        <span class="n">z</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">6</span><span class="p">])</span> <span class="o">!=</span> <span class="mf">99.990</span><span class="p">:</span>
+            <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%1c%1c%1i%6.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">z</span><span class="p">],</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">6</span><span class="p">])))</span>
+            <span class="n">h</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">h</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">7</span><span class="p">])</span> <span class="o">!=</span> <span class="mf">99.990</span> <span class="p">:</span>
+            <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%1c%1c%1i</span><span class="s1"> </span><span class="si">%5.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">z</span><span class="p">],</span><span class="s1">&#39;S&#39;</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">arrival</span><span class="p">[</span><span class="n">z</span><span class="p">][</span><span class="mi">7</span><span class="p">])))</span>
+            <span class="n">h</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">h</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="n">z</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">fidP</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0   </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span></code></pre></figure>
+
+<p>Setelah file <code>earthq.dat</code> selesai, selanjutnya adalah melihat pada bagian akhir dari file tersebut. Jangan lupa untuk menambahkan <strong>0 + 4spasi + 3enter</strong> (lihat tipikal format pada bagian sebelum baris terakhir) seperti yang ditunjukkan pada gambar dibawah ini:</p>
+
+<p><img src="http://localhost:4000/assets/images/earthq.png" alt="earthq awal" /></p>
+
+<p>menjadi seperti berikut:</p>
+
+<p><img src="http://localhost:4000/assets/images/earthq_edit.png" alt="earthq akhir" /></p>
+
+<h3 id="pembuatan-file-velocitydat">Pembuatan file <code>velocity.dat</code></h3>
+
+<p>Selanjutnya adalah pembuatan file model kecepatan atau <code>velocity.dat</code> sebagai input kecepatan dari <code>simulps12.f</code>. Adapun hal-hal yang perlu diperhatikan sebelum membuat model kecepatan, diantaranya:</p>
+
+<ul>
+  <li>Sebelum menentukan parameter grid, yang mengandung kecepatan 3 dimensi, terlebih dahulu harus dilihat persebaran stasiun dan hiposenter awal. Hal ini dilakukan untuk menentukan daerah yang akan dibuat tomografi kecepatannya secara detail. Selain itu agar dapat menentukan hiposenter yang tidak dimasukkan kedalam hitungan.</li>
+  <li>Grid nodes <strong>harus</strong> melingkupi semua hiposenter, jika tidak akan terjadi error pada <code>fort.16</code> (file history dari proses) yang menyebutkan bahwa relokasi hiposenter berada diluar grid nodes. Batas akhir dari grid nodes juga diharapkan tidak terlalu dekat dengan hiposenter terluar.</li>
+  <li>Segmentasi grid harus masuk akal dan tidak terdapat perubahan yang signifikan pada grid sebelahnya. Contoh: terdapat 5 grid kedalaman, segmentasi kedalamannya (-2, 0, 1, <strong>1.1</strong>, 5) . Jika hal tersebut terjadi maka akan terjadi <strong>“segmentation error”</strong>. <em>Segmentation error</em> ini dapat diselesaikan dengan merubah grid nodes.</li>
+</ul>
+
+<p>Berikut adalah <em>script</em> untuk membuat model kecepatan.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span></span><span class="c1">## Jumlah grid X</span>
+<span class="n">nx</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="c1">## Jumlah grid Y</span>
+<span class="n">ny</span> <span class="o">=</span> <span class="mi">19</span>
+
+<span class="c1">## Jumlah grid Z</span>
+<span class="n">nz</span> <span class="o">=</span> <span class="mi">14</span>
+
+<span class="n">nzz</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">nz</span>
+
+<span class="c1">## Nilai kecepatan pada tiap kedalaman diikuti dengan</span>
+<span class="c1">## nilai vp/vs, jumlah variable vel haruslah 2*nz</span>
+<span class="n">vel</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span>  <span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span>  <span class="mf">9.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span>  <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span>  <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">,</span> <span class="mf">1.73</span><span class="p">]</span> 
+
+<span class="c1">## nama file output (velocity.dat)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;/path/to/file/velocity.dat&#39;</span>
+
+<span class="c1">## besar grid spacing harus menjangkau seluruh event.</span>
+<span class="c1">## tambahan 2 grid akhir yang cukup jauh untuk menghindari event keluar grid</span>
+<span class="c1">## jumlah grid harus sesuai dengan nx, ny, dan nz.</span>
+<span class="c1">## jumlah spasi jangan dirubah (format fortran77) 1 posisi grid mendapat jatah 4 digit</span>
+<span class="n">fileinput</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-200.0 -25.0 -15.0  -9.0  -6.0  -4.0  -2.0   0.0   2.0   4.0   6.0   9.0  15.0  21.0 200.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">fileinput</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-200.0 -25.0 -20.0 -15.0 -10.0  -8.0  -6.0  -4.0  -2.0   0.0   2.0   4.0   6.0   8.0  10.0  12.0  15.0  25.0 200.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">fileinput</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-200.0  -2.0  -1.5  -1.0  -0.5   0.0   0.5   1.0   1.5   2.0   3.0   5.0  15.0 200.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">fileinput</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; 0  0  0  </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nzz</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+            <span class="n">fileinput</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">%5.2f</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span><span class="n">vel</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">fileinput</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">fileinput</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></code></pre></figure>
+
+<h3 id="pembuatan-file-stationsdat">Pembuatan file <code>stations.dat</code></h3>
+
+<p>Setelah 2 files utama (<code>earthq.dat</code> dan <code>velocity.dat</code>) telah selesai, selanjutnya adalah membuat file <code>stations.dat</code>. Format file dari <code>stations.dat</code> adalah sebagai berikut:</p>
+
+<p><img src="http://localhost:4000/assets/images/stations.png" alt="stations" /></p>
+
+<ul>
+  <li>Baris 1: titik pusat system dan rotasi dari koordinat system. Sebelum dirotasi, sumbu y sebagai arah utara and sumbu x kearah barat (sumbu z mengarah ke bawah, oleh karena itu <code>simulps12.f</code> menggunakan hukum tangan kanan). Letakkan titik dimanapun yang sekiranya masuk akal dengan distribusi stasiun (biasanya diletakkan tepat di tengah-tengah sistem grid).</li>
+</ul>
+
+<dl>
+  <dt>Terdiri dari:</dt>
+  <dd>
+    <ul>
+      <li>ltdo, oltm – North latitude ( <sup>o</sup> , ’ ) (oleh karena itu <strong>selalu ditulis dalam koordinat positif</strong>)</li>
+    </ul>
+  </dd>
+  <dd>
+    <ul>
+      <li>lndo, olnm – west longitude ( <sup>o</sup>, ‘ ) (oleh karena itu <strong>selalu ditulis dalam koordinat positif</strong>)</li>
+    </ul>
+  </dd>
+  <dd>
+    <ul>
+      <li>rota – sudut rotasi, searah jarum jam (<sup>o</sup>). Yang dapat merotasi semua sistem koordinat.</li>
+    </ul>
+  </dd>
+</dl>
+
+<ul>
+  <li>Baris 2: nsts – jumlah stasiun yang digunakan
+Stasiun ditulis dengan urutan kesamping berturut-turut: nama stasiun, latitude( <sup>o</sup>, ‘ ), longitude ( <sup>o</sup>, ‘ ), elevasi (m), koreksi stasiun vp, koreksi stasiun untuk vp/vs, dan “flag” (0 membiarkan berpindah selama proses inversi, 1 untuk menjaganya konstan).</li>
+</ul>
+
+<p>Program <code>simulps12.f</code> ditulis dalam bahasa fortran yang artinya sangat sensitif dalam hal porsi dimensi panjang desimal yang akan dibaca (format banyaknya desimal yang akan dibaca dapat dilihat pada user manual yang asli). Sehingga pada <code>stations.dat</code> terdapat hal-hal yang perlu diperhatikan. Untuk mempermudahnya saya ilustrasikan seperti pada gambar dibawah ini:</p>
+
+<p><img src="http://localhost:4000/assets/images/stations_sensitive.png" alt="stations sensitive" /></p>
+
+<blockquote>
+  <p>1 titik berwarna merah mengindikasikan 1 spasi (<em>perhatikan 3 spasi paling bawah <strong>itu merupakan bagian yang penting</strong></em>)</p>
+</blockquote>
+
+<p>jangan lupa untuk merubah format (<em>encoding</em> file) dari file text <strong>(khusus pengguna windows)</strong> file windows menggunakan format <code>CRLF</code> sedangkan linux adalah <code>LF</code>. Ubahlah format file tersebut menjadi <code>LF</code>. Sebagai ilustrasi seperti yang ditunjukkan pada gambar dibawah ini:</p>
+
+<p><img src="http://localhost:4000/assets/images/windowsformat.png" alt="My helpful screenshot" /></p>
+
+<p>menjadi seperti berikut:</p>
+
+<p><img src="http://localhost:4000/assets/images/linuxformat.png" alt="linux" /></p>
+
+<h3 id="pembuatan-file-controldat">Pembuatan file <code>control.dat</code></h3>
+
+<p>Berikutnya adalah membuat file <code>control.dat</code> yang berisikan parameter inversi yang akan digunakan pada saat proses inversi. Format penulisan file <code>control.dat</code> dapat dilihat pada gambar dibawah ini:</p>
+
+<p><img src="http://localhost:4000/assets/images/control.png" alt="control_dat" /></p>
+
+<p>Penulisan angka parameter input sebelah kiri dan keterangan control ada disebelah kanan secara berurutan.</p>
+
+<p>Berikut merupakan penjelasan pada setiap baris:</p>
+
+<p><strong>Baris pertama</strong>:</p>
+<ul>
+  <li>neqs = jumlah gempa/event mikroseismik dalam dataset</li>
+  <li>nshot = jumlah shot pada dataset (jika pasif seismik ditulis 0)</li>
+  <li>nblast = jumlah blast (jika lokasi event diketahui namun origin time tidak diketahui)</li>
+  <li>wtsht = bobot dari shot relative terhadap gempa</li>
+  <li>kout = output file parameter</li>
+  <li>kout2 = printout untuk fort 16</li>
+  <li>kout3 = output control parameter</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>kout</th>
+      <th>File output</th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>16<sup>*</sup></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>16<sup>*</sup></td>
+      <td> </td>
+      <td>13</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>16<sup>*</sup></td>
+      <td> </td>
+      <td>13</td>
+      <td>22</td>
+      <td>23</td>
+      <td>24,28<sup>+</sup></td>
+      <td> </td>
+      <td> </td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>16<sup>*</sup></td>
+      <td> </td>
+      <td>13</td>
+      <td>22</td>
+      <td>23</td>
+      <td>24,28<sup>+</sup></td>
+      <td> </td>
+      <td>34</td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>16<sup>*</sup></td>
+      <td> </td>
+      <td>13</td>
+      <td>22</td>
+      <td>23</td>
+      <td>24,28<sup>+</sup></td>
+      <td>25</td>
+      <td>34</td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>16<sup>*</sup></td>
+      <td>12</td>
+      <td>13</td>
+      <td>22</td>
+      <td>23</td>
+      <td>24,28<sup>+</sup></td>
+      <td>25</td>
+      <td>34</td>
+      <td>26</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li><code>fort.16</code> berisi histori perhitungan yang dilakukan <code>simulps12.f</code>, jika terjadi <em>error</em> pada saat program dijalankan dapat dilihat permasalahannya pada file ini.</li>
+  <li><sup>+</sup> <code>fort.28</code> terbentuk saat data mengandung blast.</li>
+  <li><code>fort.22</code> tidak akan terbentuk jika “invdel = 0”</li>
+  <li><code>fort.15</code> dan <code>fort.19</code>, lihat kout3 selanjutnya. Terbentuk saat kout3=1</li>
+  <li><code>fort.18</code> terbentuk ketika terdapat nodes yang dibiarkan tetap</li>
+  <li><code>fort.20</code>, lihat kout2 selanjutnya. Terbentuk saat kout2 bernilai 0 atau 1</li>
+  <li><code>fort.45</code>, lihat kout2 selanjutnya. Terbentuk saat ires ≥ 2 dan kout2=5</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>kout2</th>
+      <th>File output</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Full printout, termasuk residual stasiun dan relokasi tiap step</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Print hanya residual stasiun.++</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Print lokasi event tiap step</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Jangan print relokasi atau residual stasiun</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>…juga jangan print stasiun</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>…lakukan output 1/diag(C) ke fort 16 dan fort 45 jika ires &gt; 0</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>kout3</th>
+      <th>File output</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Jangan buat output point raypath atau perbedaan traveltime</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Output raypath point ke fort 15, untuk semua raypath.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Baris kedua</strong>:</p>
+<ul>
+  <li>nitloc = jumlah maksimum dari iterasi untuk relokasi hiposenter</li>
+  <li>wtsp = untuk solusi hiposenter, bobot dari residual ts-tp relative terhadap residual tp (contoh. Wtsp=1. memberikan bobot yang sama untuk ts-tp dan tp, sedangkan wtsp&lt;1 memberikan bobot ts-tp yang lebih kecil dari tp)</li>
+  <li>eigtol = singular value decomposition (SVD) cutoff dari penyesuaian hiposenter. Jika nilai terendah eigenvalue dari matrix Geiger &lt; eigtol, maka perubahan kedalaman tidak akan disesuaikan dan catatan akan ditulis pada <code>fort.16</code></li>
+  <li>rmscut = nilai dari RMS residual bawah yang mana jika nilai residual dibawah nilai RMS penyesuaian hiposenter akan dihentikan</li>
+  <li>zmin = kedalaman hiposenter minimum (nilai negative untuk elevasi diatas msl namun dibawah permukaan tanah). Diatur agar berada di atas stasiun tertinggi untuk menghindari “airquakes”.</li>
+  <li>dxmax = penyesuaian hiposenter secara horizontal yang diperbolehkan untuk tiap iterasi dalam km</li>
+  <li>rderr = estimasi dari error picking ( biasanya pada rentang 0.01-0.05s). Digunakan untuk mengestimasi error hiposenter.</li>
+  <li>ercof = untuk error perhitungan hypoinverse. Set 0.0&lt;ercof&lt;1.0 untuk memasukkan RMS residual pada estimasi error hiposenter</li>
+</ul>
+
+<p><strong>Baris ketiga</strong>:</p>
+<ul>
+  <li>nhitct = DWS minimum untuk parameter yang dimasukkan kedalam inversi (biasanya ≥5)</li>
+  <li>dvpmx = penyesuaian vp maksimum yang diperbolehkan untuk tiap iterasi</li>
+  <li>dvsmx = penyesuaian vs maksimum yang diperbolehkan untuk tiap iterasi</li>
+  <li>idmp = 1 untuk menghitung ulang nilai damping tiap iterasi (adaptive damping), 0 untuk menjaga nilai damping tetap.</li>
+  <li>vpdamp = parameter damping vp pada inversi kecepatan</li>
+  <li>vsdamp = parameter damping vs pada inversi kecepatan</li>
+  <li>stadamp = parameter damping stasiun pada inversi kecepatan (delay stasiun)</li>
+  <li>stepl = step length (km) yang digunakan untuk menghitung turunan parsial sepanjang raypath</li>
+</ul>
+
+<p><strong>Baris keempat</strong>:</p>
+<ul>
+  <li>ires = control perhitungan dari R dan C</li>
+  <li>i3d = “flag” untuk menggunakan raytracing pseudo-bending</li>
+  <li>nitmax = jumlah iterasi maksimum pada inversi kecepatan. Untuk menghitung hanya lokasi hiposenter set nitmax=0. Jika nitmax = -1, travel time sintetik dihitung berdasarkan raytracing yang digunakan pada input awal.</li>
+  <li>snrmct = nilai cutoff untuk solusi norm. simulp12 akan menghentikan iterasi jika nilai norm lebih kecil dari snrmct</li>
+  <li>ihomo = biasanya, ihomo=1 jika kecepatan awal dimulai dengan 1-D model dan ihomo=0 jika kecepatan awal yang digunakan 3-D.</li>
+  <li>rmstop = RMS global untuk menghentikan iterasi.</li>
+  <li>ifixl = jumlah inversi kecepatan untuk menjaga hiposenter tetap pada posisinya</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>ires</th>
+      <th>Hasil</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Tidak ada resolusi perhitungan</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Menghitung resolusi dan menghasilkan elemen diagonal.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Output, ke <code>fort.17</code>, resolusi keseluruhan</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Menghitung resolusi pada iterasi pertama saja</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>i3d</th>
+      <th>Hasil</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Tidak menggunakan pseudo-bending</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Menggunakan pseudo-bending hanya pada forward modeling untuk menghitung turunan parsial dari kecepatan</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Menggunakan pseudo-bending pada penentuan lokasi gempa</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Menggunakan pseudo-bending dengan mengabaikan curvature dibawah lapisan Moho</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Baris kelima</strong>:</p>
+<ul>
+  <li>delt1, delt2 = bobot jarak episenter untuk semua bagian dalam inversi</li>
+  <li>res1, res2, res3 = pengaturan bobot sebagai fungsi dari residual. Nilai res1 dan res2 harus linear begitu pula dengan res2 dan res3. catatan: res3 harus diset sangat besar (contohnya 5)</li>
+</ul>
+
+<p><strong>Baris keenam</strong>:</p>
+<ul>
+  <li>ndip = jumlah sudut rotasi (dari -90<sup>o</sup> sampai 90<sup>o</sup>) dari bidang yang mana ray akan mencari jalan tercepat.</li>
+  <li>iskip = jumlah dari sudut rotasi yang dihidari (skip) baik secara horizontal maupun vertikal. Contoh: ndip=9 dan iskip=3 melewatkan 1 bidang vertikal dan 2 horizontal pada sudut 22.5<sup>o</sup>.</li>
+  <li>scale1 = mengatur panjangnya perubahan tiap iterasi saat perhitungan travel time (km). Atur sedemikian hingga tidak lebih besar dari spasi grid nodes terkecil.</li>
+  <li>scale2 = skala (dalam km) untuk jumlah jalan yang dilewati oleh raytracing (interval antara pembengkokkan dalam ray). Jika nilai scale2 kecil, maka jumlah kemungkinan raypath yang dilewati makin besar konsekuensinya waktu pemrosesan data menjadi lebih lama</li>
+</ul>
+
+<p><strong>Baris ketujuh</strong>:</p>
+<ul>
+  <li>xfac = perbaikan faktor kekonvergenan untuk pseudo-bending. Nilai yang disarankan 1.2≤xfact≤1.5</li>
+  <li>tlim = perbedaan traveltime yang digunakan untuk menghentikan perhitungan (gunakan 0.0005≤tlim ≤0,002s)</li>
+  <li>nitpb = jumlah maksimum dari iterasi yang diperbolehkan untuk pseudo-bending (gunakan antara 5-10).</li>
+</ul>
+
+<p><strong>Baris kedelapan</strong>:</p>
+<ul>
+  <li>iusep = 1 untuk menginversi tp ke vp. 0 untuk mencegah inversi vp</li>
+  <li>iuses = 1 untuk menginversi ts-tp ke vp/vs. 0 untuk mencegah inversi vp/vs</li>
+  <li>invdelay = 1 untuk menginversi ke delay stasiun. 0 untuk mencegahnya</li>
+</ul>
+
+<h3 id="menjalankan-program-simulps12f">Menjalankan program <code>simulps12.f</code></h3>
+<p>Sebelum mulai menjalankan program (<em>compiling</em>), terlebih dahulu pastikan semua file input (<code>control.dat</code>, <code>velocity.dat</code>, <code>earthq.dat</code>, <code>stations.dat</code>, <code>simulps12.f</code>, <code>simulps_common.inc</code>, dan <code>velfile.33tq1c</code>) berada pada 1 folder yang sama.</p>
+
+<p>Compile semua file menjadi 1 (dapat dioperasikan pada ubuntu 16.04 dengan gfortran, gcc 5.4.0).</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>~/path/to/file/ gfortran -std<span class="o">=</span>legacy simulps12.f -o out.file</code></pre></figure>
+
+<p>Setelah semua file tersebut ter-compile maka jalankanlah file eksekusi <code>out.file</code></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>~/path/to/file/ ./out.file</code></pre></figure>
+
+<p>Jika program telah selesai melakukan perhitungan, hasil relokasi hiposenter dan inversi kecepatan dapat dilihat pada <code>fort.16</code> atau <code>fort.23</code> berturut-turut untuk selanjutnya dilakukan plotting.</p>
+
+<blockquote>
+  <p>Mohon maaf atas ketidak-rapian postingan ini. Akhir kata selamat mencoba, jika ada pertanyaan silahkan menghubungi hendrawan.palgunadi@gmail.com</p>
+</blockquote>
+
+
+        </section>
+
+        
+
+        <footer class="post-footer">
+            <!-- If we want to display author's name and bio -->
+            
+                <figure class="author-image">
+                    <a class="img" href="/" style="background-image: url(/assets/images/palgu.jpeg)">
+                    <span class="hidden">Kadek Hendrawan Palgunadi's Picture</span></a>
+                </figure>
+                <section class="author">
+                    <!-- Author Name -->
+                    <h4> Kadek Hendrawan Palgunadi </h4>
+                    <!-- Author Bio -->
+                    <p>
+                        I am a final year master student at IPG Paris in exploration geophysics 
+                    </p>
+                </section>
+            
+
+            <!-- Share links section -->
+            <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?text=User Manual SIMULPS12 (Bahasa Indonesia)&amp;url=localhost:4000/software/manual/2017/02/20/first.html"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=localhost:4000/software/manual/2017/02/20/first.html"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=localhost:4000/software/manual/2017/02/20/first.html"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+            <!-- Disqus comments -->
+            
+
+        </footer>
+
+    </article>
+
+</main>
+
+    <footer class="site-footer clearfix">
+      <section class="copyright">
+        <a href="/">Kadek Palgunadi's Blog</a> &copy; 
+              2018 &bull; All rights reserved.
+      </section>
+      <section class="poweredby">Made with Jekyll using 
+        <a href="http://github.com/rosario/kasper">Kasper theme</a>
+      </section>
+    </footer>
+    
+    <script type="text/javascript" src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Google Analytics Tracking code -->
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>   
+</body>
+</html>

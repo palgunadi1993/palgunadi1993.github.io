@@ -1,0 +1,429 @@
+---
+layout: post
+title:  "User Manual SIMULPS12 (Bahasa Indonesia)"
+date:   2017-02-20 00:00:00
+categories: software manual
+---
+
+> ***disclaimer*** : Ini merupakan tutorial cara menggunakan software simulps12.f (yang sudah di modifikasi) dan mempersiapkan data input yang akan digunakan pada simulps12.f. Jika menggunakan software ini jangan lupa untuk mensitasi (Evans, J.R., Eberhart-Phillips, D., Thurber, C.H., 1994. User's Manual for SIMULPS12 for imaging VP and VP/VS: a Derivative of the Thurber Tomographic Inversion SIMUL3 for Local Earthquakes and Explosions. US Geological Survey Open File Report OFR 94-431, p. 101.)[link][User-manual]
+
+> Sebelum memulai menjalan program ini, silahkan menginstall beberapa *dependecies* dari *python library* yang diantaranya: [pyproj][Pyproj], numpy, dan beberapa library standar python2/python3
+
+
+Sebelum memulai mempersiapkan data input terlebih dahulu silahkan *download* `simulps12.f` dan file pendukungnya (`simulps_common.inc` dan `velfile.33tq1c`) yang telah saya __modifikasi__ beberapa fungsinya sehingga dapat digunakan pada *modern* Linux pada tautan berikut ini.
+* [simulps12.f]({{"/assets/documents/simulps12.f"}})
+* [simulps_common.inc]({{ "/assets/documents/simulps_common.inc" | absolute_url }})
+* [velfile.33tq1c]({{ "/assets/documents/velfile.33tq1c" | absolute_url }})
+
+Ketiga file tersebut harus disimpan pada satu folder yang sama untuk memudahkan proses *compiling*. File `simulps12.f` merupakan program utama yang berisi semua algoritma dan proses *local earthquakes tomography* dalam bahasa `fortran77`, sedangkan `simulps_common.inc` merupakan parameter-parameter *grid-nodes* dan banyaknya stasiun serta gempa maksimum pada input. File ini (`simulps_common.inc`) dapat diedit sesuai dengan kebutuhan pengguna. 
+
+### Pembuatan file `earthq.dat`
+
+Selanjutnya akan saya jelaskan bagaimana untuk membuat file input serta meng-*compile* pada sistem linux-mac juga sepertinya juga bisa- (non-windows). Pertama-tama persiapkanlah data hasil penentuan lokasi gempa seperti pada contoh berikut ini:
+
+<table>
+	<tr><td>yearmonthdayhourminutes</td><td>year-month-day</td><td>hour</td><td>minutes</td><td>seconds (origin time)</td><td>UTMY(km)</td><td>UTMX(km)</td><td>depth(km)</td></tr>
+	<tr><td>201810142252</td><td>2018-10-14</td><td>22</td><td>52</td><td>27.001</td><td>7203.24500</td><td>589.305</td><td>000.1234
+	</td></tr>
+	<tr><td>201810152011</td><td>2018-10-15</td><td>20</td><td>11</td><td>46.460</td><td>7200.15900</td><td>588.953</td><td>015.2345
+	</td></tr>
+	<tr><td>201810161421</td><td>2018-10-16</td><td>14</td><td>21</td><td>23.387</td><td>7188.16700</td><td>500.398</td><td> -3.3456</td></tr>
+
+</table>
+
+
+Namakan file diatas dengan `origin_time.txt` tanpa menyertai *header* file.
+
+
+<table><tr><td>Num Event</td><td>yearmonthdayhourminutes</td><td>station</td><td>year</td><td>month</td><td>day</td><td>hours</td><td>minutes</td><td>arrival P(s)</td><td>arrival S(s)</td></tr><tr><td>1</td><td>1210142052</td><td>B21</td><td>2012</td><td>10</td><td>14</td><td>20</td><td>52</td><td>28.09</td><td>28.851</td></tr><tr><td>1</td><td>1210142052</td><td>B22</td><td>2012</td><td>10</td><td>14</td><td>20</td><td>52</td><td>28.344</td><td>29.340</td></tr><tr><td>1</td><td>1210142052</td><td>B23</td><td>2012</td><td>10</td><td>14</td><td>20</td><td>52</td><td>28.434</td><td>29.449</td></tr><tr><td>2</td><td>1210152111</td><td>B18</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>49.999</td><td>52.622</td></tr><tr><td>2</td><td>1210152111</td><td>SP1</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>50.043</td><td>52.569</td></tr><tr><td>2</td><td>1210152111</td><td>B21</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>50.121</td><td>52.533</td></tr><tr><td>2</td><td>1210152111</td><td>B23</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>50.358</td><td>52.962</td></tr><tr><td>2</td><td>1210152111</td><td>B09</td><td>2012</td><td>10</td><td>15</td><td>21</td><td>11</td><td>51.247</td><td>54.722</td></tr></table>
+
+
+Namakan file diatas dengan nama file `arrival_time.txt`. Data di atas merupakan data *dummy*.
+
+Setelah menyimpan kedua files tersebut, silahkan untuk menjalankan *code* dibawah ini:
+__catatan__: untuk perubahan lokasi UTM48S dapat dilakukan dengan melihat [disini][epsg].
+
+
+{% highlight python %}
+import pyproj
+
+## Fungsi yang berfungsi untuk konversi koordinat dari utm ke longitude lattitude
+def konversi(utmx,utmy):
+    wgs84=pyproj.Proj("+init=EPSG:4326") 
+    UTM48S=pyproj.Proj("+init=EPSG:32748") ## Khusus untuk area 48S, jika ingin mengubah daerah lain silahkan
+    longitude, latitude = pyproj.transform(UTM48S, wgs84, utmx, utmy)
+    return longitude, latitude
+
+## Importing file dari file txt yang telah dibuat sebelumnya
+fileinput = '/path/of/this/file/origin_time.txt'
+fileinput2 = '/path/of/this/file/arrival_time.txt'
+
+## Membaca file origin_time.txt dan menyimpannya dalam variabel baris
+file = open(fileinput,'r')
+baris = file.readlines()
+for i in range(len(baris)):
+	baris[i]=baris[i].split()
+file.close()
+
+## Membaca file arrival_time.txt dan menyimpan dalam variabel baris2
+file = open(fileinput2,'r')
+baris2 = file.readlines()
+for i in range(len(baris2)):
+	baris2[i]=baris2[i].split()
+file.close()
+
+## Nama file input earthq.dat dan alamat tempat menyimpannya
+file = open('/path/to/next/process/travel_time.txt','w')
+latlon = open('/path/to/next/process/hypocenter.txt','w')
+station = open('/path/to/next/process/stations.dat','w')
+
+## inisiasi looping
+j = 0
+jj = 1
+xx = 1
+for j in range(0, len(baris2)):
+    i = int(baris2[j][0]) - 1
+    tahun = baris2[j][3]
+    if float(baris[i][9]) < 181:
+        tahun_latlon = baris[i][1]
+        utmx = 1000*float(baris[i][6]) ## faktor 1000 karena ingin merubah UTM dari km ke m
+        utmy = 1000*float(baris[i][5]) ## faktor 1000 karena ingin merubah UTM dari km ke m
+        lat_lon = konversi(utmx,utmy)  ## konversi variabel koordinat
+        lon = lat_lon[0]
+        lon_men = (lon - int(lon))*60  
+        lat = -1*lat_lon[1]
+        lat_men = (lat - int(lat))*60
+        
+        ## Proses seleksi dan pembuatan file
+        if baris2[j][8] == '99.99' or baris2[j][9] == '99.99': ## mengabaikan fase P dan S yang tidak ada nilainya.
+                continue 
+        elif int(baris[i][3]) == int(baris2[j][7]):
+            tp_to = float(baris2[j][8]) - float(baris[i][4])
+            ts_to = float(baris2[j][9]) - float(baris[i][4])
+            ts_tp = float(baris2[j][9]) - float(baris2[j][8])
+        else:
+            tp_to = float(baris2[j][8]) - float(baris[i][4]) + 60
+            ts_to = float(baris2[j][9]) - float(baris[i][4]) + 60
+            ts_tp = float(baris2[j][9]) - float(baris2[j][8])
+        
+        if j == 0 :
+            file.write(tahun[-2:]+'\t'+baris2[j][4]+'\t'+baris2[j][5]+'\t'+baris2[j][6]+'\t'+baris2[j][7]+'\t 0 \t'+('%.3f')%(tp_to)+'\t'+('%.3f')%(ts_tp)+'\t1\n')
+            latlon.write(tahun_latlon[2:4]+tahun_latlon[5:7]+tahun_latlon[8:10]+'\t'+baris[i][2]+baris[i][3]+'\t'+('%.2f')%float(baris[i][4])+'\t'+str(int(lat))+'\t'+('%.2f')%lat_men+'\t'+str(int(lon))+'\t'+('%.2f')%lon_men+'\t'+('%.3f')%float(baris[i][7])+'\t'+str(xx)+'\n')        
+            station.write(baris2[j][3][3]+baris2[j][2]+'\n')
+            xx += 1             
+            jj += 1
+        elif float(baris2[j][0]) - float(baris2[j-1][0]) == 1:
+            file.write(tahun[-2:]+'\t'+baris2[j][4]+'\t'+baris2[j][5]+'\t'+baris2[j][6]+'\t'+baris2[j][7]+'\t 0 \t'+('%.3f')%(tp_to)+'\t'+('%.3f')%(ts_tp)+'\t'+str(jj)+'\n')
+            latlon.write(tahun_latlon[2:4]+tahun_latlon[5:7]+tahun_latlon[8:10]+'\t'+baris[i][2]+baris[i][3]+'\t'+('%.2f')%float(baris[i][4])+'\t'+str(int(lat))+'\t'+('%.2f')%lat_men+'\t'+str(int(lon))+'\t'+('%.2f')%lon_men+'\t'+('%.3f')%float(baris[i][7])+'\t'+str(xx)+'\n')        
+            station.write(baris2[j][3][3]+baris2[j][2]+'\n')
+            xx += 1             
+            jj += 1
+        else:
+            file.write(tahun[-2:]+'\t'+baris2[j][4]+'\t'+baris2[j][5]+'\t'+baris2[j][6]+'\t'+baris2[j][7]+'\t 0 \t'+('%.3f')%(tp_to)+'\t'+('%.3f')%(ts_tp)+'\n')
+            station.write(baris2[j][3][3]+baris2[j][2]+'\n')
+        
+file.close()
+latlon.close()
+station.close()
+{% endhighlight %}
+
+Program diatas dapat di *copy* kedalam IDE python2/python3 yang anda miliki. Selanjutnya anda akan membuat file input `simulps12.f` yaitu `earthq.dat`. Ketiga file diatas akan digunakan sebagai input pembuatan `earthq.dat`. Untuk membuat file `earthq.dat` bisa dengan menjalankan program dibawah ini.
+
+
+{% highlight python %}
+import numpy as np
+
+## import origin time
+fileinput = '/path/to/next/process/hypocenter.txt'
+
+## Kita namakan dengan variabel location
+location = np.loadtxt(fileinput)
+
+## import file travel_time.txt
+input_arrival = '/path/to/next/process/travel_time.txt'
+input_arrival = open(input_arrival,'r')
+arrival = input_arrival.readlines()
+for i in range(len(arrival)):
+    arrival[i] = arrival[i].split()
+input_arrival.close()
+
+## import file stations.txt
+file_stations = '/path/to/next/process/stations.dat'
+station = np.loadtxt(file_stations,dtype=str)
+
+## Nama file output (earthq.dat)
+fidP = open('earthq.dat', 'w')
+
+year_mon_day = location[:,0]
+hours_minutes = location[:,1]
+sec = location[:,2]
+latdeg = location[:,3]
+latmin = location[:,4]
+longdeg = location[:,5]
+longmin = location[:,6]
+depth = location[:,7]
+ID = location [:,8]
+Y = 2.0
+k = 1
+h = 0
+
+event = 0
+for p in range(len(arrival)):
+    if len(arrival[p]) == 9:
+        event += 1
+
+z = 0
+for i in range(event):
+    fidP.write('%s%5d %s  %s%6.2f %s %.2f%7.2f   %.2f\n' % (str(int(year_mon_day[i])), hours_minutes[i], str(sec[i]), str(int(latdeg[i])), latmin[i], str(int(longdeg[i])), longmin[i], depth[i], Y))
+    if float(arrival[z][6]) != 99.990:
+        fidP.write('%s %1c%1c%1i%6.3f' % (station[i], 'P', ' ',0,float(arrival[i][6])))
+        h += 1
+    if float(arrival[z][7]) != 99.990:
+        fidP.write('%s %1c%1c%1i %5.3f' % (station[z], 'S', ' ',0,float(arrival[z][7])))
+        h += 1
+    z += 1
+    
+    while len(arrival[z][:])==8:
+        z
+        if float(arrival[z][6]) != 99.990:
+            fidP.write('%s %1c%1c%1i%6.3f' % (station[z], 'P', ' ',0,float(arrival[z][6])))
+            h += 1
+        if np.mod(h,6)==0 and h != 0:
+            fidP.write('\n')
+            h = 0
+        if float(arrival[z][7]) != 99.990 :
+            fidP.write('%s %1c%1c%1i %5.3f' % (station[z],'S',' ',0,float(arrival[z][7])))
+            h += 1
+        if np.mod(h,6)==0 and h != 0:
+            fidP.write('\n')
+            h = 0
+        
+        z += 1
+    if h != 0:
+        fidP.write('\n')
+    fidP.write('0   \n')
+    h = 0
+{% endhighlight %}
+
+Setelah file `earthq.dat` selesai, selanjutnya adalah melihat pada bagian akhir dari file tersebut. Jangan lupa untuk menambahkan __0 + 4spasi + 3enter__ (lihat tipikal format pada bagian sebelum baris terakhir) seperti yang ditunjukkan pada gambar dibawah ini:
+
+![earthq awal]({{ "/assets/images/earthq.png" | absolute_url }})
+
+menjadi seperti berikut:
+
+![earthq akhir]({{ "/assets/images/earthq_edit.png" | absolute_url }})
+
+### Pembuatan file `velocity.dat`
+
+Selanjutnya adalah pembuatan file model kecepatan atau `velocity.dat` sebagai input kecepatan dari `simulps12.f`. Adapun hal-hal yang perlu diperhatikan sebelum membuat model kecepatan, diantaranya:
+
+* Sebelum menentukan parameter grid, yang mengandung kecepatan 3 dimensi, terlebih dahulu harus dilihat persebaran stasiun dan hiposenter awal. Hal ini dilakukan untuk menentukan daerah yang akan dibuat tomografi kecepatannya secara detail. Selain itu agar dapat menentukan hiposenter yang tidak dimasukkan kedalam hitungan.
+* Grid nodes __harus__ melingkupi semua hiposenter, jika tidak akan terjadi error pada `fort.16` (file history dari proses) yang menyebutkan bahwa relokasi hiposenter berada diluar grid nodes. Batas akhir dari grid nodes juga diharapkan tidak terlalu dekat dengan hiposenter terluar.
+* Segmentasi grid harus masuk akal dan tidak terdapat perubahan yang signifikan pada grid sebelahnya. Contoh: terdapat 5 grid kedalaman, segmentasi kedalamannya (-2, 0, 1, __1.1__, 5) . Jika hal tersebut terjadi maka akan terjadi __“segmentation error”__. *Segmentation error* ini dapat diselesaikan dengan merubah grid nodes.
+
+Berikut adalah *script* untuk membuat model kecepatan.
+
+
+{% highlight python %}
+## Jumlah grid X
+nx = 15
+
+## Jumlah grid Y
+ny = 19
+
+## Jumlah grid Z
+nz = 14
+
+nzz = 2*nz
+
+## Nilai kecepatan pada tiap kedalaman diikuti dengan
+## nilai vp/vs, jumlah variable vel haruslah 2*nz
+vel = [1.0, 2.0, 3.0, 3.0, 3.0, 4.0, 5.0, 6.0,  7.0, 8.0, 8.0, 9.0,  9.0, 9.0,  1.73, 1.73,  1.73, 1.73, 1.73, 1.73, 1.73, 1.73, 1.73, 1.73, 1.73, 1.73, 1.73, 1.73] 
+
+## nama file output (velocity.dat)
+data = '/path/to/file/velocity.dat'
+
+## besar grid spacing harus menjangkau seluruh event.
+## tambahan 2 grid akhir yang cukup jauh untuk menghindari event keluar grid
+## jumlah grid harus sesuai dengan nx, ny, dan nz.
+## jumlah spasi jangan dirubah (format fortran77) 1 posisi grid mendapat jatah 4 digit
+fileinput.write('-200.0 -25.0 -15.0  -9.0  -6.0  -4.0  -2.0   0.0   2.0   4.0   6.0   9.0  15.0  21.0 200.0\n')
+fileinput.write('-200.0 -25.0 -20.0 -15.0 -10.0  -8.0  -6.0  -4.0  -2.0   0.0   2.0   4.0   6.0   8.0  10.0  12.0  15.0  25.0 200.0\n')
+fileinput.write('-200.0  -2.0  -1.5  -1.0  -0.5   0.0   0.5   1.0   1.5   2.0   3.0   5.0  15.0 200.0\n')
+fileinput.write(' 0  0  0  \n')
+
+i = 0
+j = 0
+k = 0
+for i in range(nzz):
+    for j in range(ny):
+        for k in range(nx):
+            fileinput.write(('%5.2f')%vel[i])
+        fileinput.write('\n')
+
+fileinput.close()
+{% endhighlight %}
+
+### Pembuatan file `stations.dat`
+
+Setelah 2 files utama (`earthq.dat` dan `velocity.dat`) telah selesai, selanjutnya adalah membuat file `stations.dat`. Format file dari `stations.dat` adalah sebagai berikut:
+
+![stations]({{ "/assets/images/stations.png" | absolute_url }})
+
+* Baris 1: titik pusat system dan rotasi dari koordinat system. Sebelum dirotasi, sumbu y sebagai arah utara and sumbu x kearah barat (sumbu z mengarah ke bawah, oleh karena itu `simulps12.f` menggunakan hukum tangan kanan). Letakkan titik dimanapun yang sekiranya masuk akal dengan distribusi stasiun (biasanya diletakkan tepat di tengah-tengah sistem grid).
+
+Terdiri dari:
+
+: * ltdo, oltm – North latitude ( <sup>o</sup> , ’ ) (oleh karena itu __selalu ditulis dalam koordinat positif__)
+: * lndo, olnm – west longitude ( <sup>o</sup>, ‘ ) (oleh karena itu __selalu ditulis dalam koordinat positif__)
+: * rota – sudut rotasi, searah jarum jam (<sup>o</sup>). Yang dapat merotasi semua sistem koordinat.
+
+* Baris 2: nsts – jumlah stasiun yang digunakan
+Stasiun ditulis dengan urutan kesamping berturut-turut: nama stasiun, latitude( <sup>o</sup>, ‘ ), longitude ( <sup>o</sup>, ‘ ), elevasi (m), koreksi stasiun vp, koreksi stasiun untuk vp/vs, dan “flag” (0 membiarkan berpindah selama proses inversi, 1 untuk menjaganya konstan).
+
+Program `simulps12.f` ditulis dalam bahasa fortran yang artinya sangat sensitif dalam hal porsi dimensi panjang desimal yang akan dibaca (format banyaknya desimal yang akan dibaca dapat dilihat pada user manual yang asli). Sehingga pada `stations.dat` terdapat hal-hal yang perlu diperhatikan. Untuk mempermudahnya saya ilustrasikan seperti pada gambar dibawah ini:
+
+![stations sensitive]({{ "/assets/images/stations_sensitive.png" | absolute_url }})
+
+> 1 titik berwarna merah mengindikasikan 1 spasi (*perhatikan 3 spasi paling bawah __itu merupakan bagian yang penting__*)
+
+jangan lupa untuk merubah format (*encoding* file) dari file text **(khusus pengguna windows)** file windows menggunakan format `CRLF` sedangkan linux adalah `LF`. Ubahlah format file tersebut menjadi `LF`. Sebagai ilustrasi seperti yang ditunjukkan pada gambar dibawah ini:
+
+![My helpful screenshot]({{ "/assets/images/windowsformat.png" | absolute_url }})
+
+menjadi seperti berikut:
+
+![linux]({{ "/assets/images/linuxformat.png" | absolute_url }})
+
+### Pembuatan file `control.dat`
+
+Berikutnya adalah membuat file `control.dat` yang berisikan parameter inversi yang akan digunakan pada saat proses inversi. Format penulisan file `control.dat` dapat dilihat pada gambar dibawah ini:
+
+![control_dat]({{ "/assets/images/control.png" | absolute_url }})
+
+Penulisan angka parameter input sebelah kiri dan keterangan control ada disebelah kanan secara berurutan.
+
+Berikut merupakan penjelasan pada setiap baris:
+
+__Baris pertama__:
+* neqs = jumlah gempa/event mikroseismik dalam dataset
+* nshot = jumlah shot pada dataset (jika pasif seismik ditulis 0)
+* nblast = jumlah blast (jika lokasi event diketahui namun origin time tidak diketahui)
+* wtsht = bobot dari shot relative terhadap gempa
+* kout = output file parameter
+* kout2 = printout untuk fort 16
+* kout3 = output control parameter
+
+|kout|File output                                                         |
+|----|--------------------------------------------------------------------|
+|0| 16<sup>*</sup> |    |    |    |    |                   |    |    | 26 |
+|1| 16<sup>*</sup> |    | 13 |    |    |                   |    |    | 26 |
+|2| 16<sup>*</sup> |    | 13 | 22 | 23 | 24,28<sup>+</sup> |    |    | 26 |
+|3| 16<sup>*</sup> |    | 13 | 22 | 23 | 24,28<sup>+</sup> |    | 34 | 26 |
+|4| 16<sup>*</sup> |    | 13 | 22 | 23 | 24,28<sup>+</sup> | 25 | 34 | 26 |
+|5| 16<sup>*</sup> | 12 | 13 | 22 | 23 | 24,28<sup>+</sup> | 25 | 34 | 26 |
+
+* `fort.16` berisi histori perhitungan yang dilakukan `simulps12.f`, jika terjadi *error* pada saat program dijalankan dapat dilihat permasalahannya pada file ini.
+* <sup>+</sup> `fort.28` terbentuk saat data mengandung blast.
+* `fort.22` tidak akan terbentuk jika “invdel = 0”
+* `fort.15` dan `fort.19`, lihat kout3 selanjutnya. Terbentuk saat kout3=1
+* `fort.18` terbentuk ketika terdapat nodes yang dibiarkan tetap
+* `fort.20`, lihat kout2 selanjutnya. Terbentuk saat kout2 bernilai 0 atau 1
+* `fort.45`, lihat kout2 selanjutnya. Terbentuk saat ires ≥ 2 dan kout2=5
+
+|kout2| File output|
+|-----|------------|
+|0| Full printout, termasuk residual stasiun dan relokasi tiap step|
+|1| Print hanya residual stasiun.++|
+|2| Print lokasi event tiap step|
+|3| Jangan print relokasi atau residual stasiun|
+|4| ...juga jangan print stasiun|
+|5| ...lakukan output 1/diag(C) ke fort 16 dan fort 45 jika ires > 0|
+
+|kout3| File output|
+|-----|------------|
+|0|Jangan buat output point raypath atau perbedaan traveltime|
+|1|Output raypath point ke fort 15, untuk semua raypath.
+
+__Baris kedua__:
+* nitloc = jumlah maksimum dari iterasi untuk relokasi hiposenter
+* wtsp = untuk solusi hiposenter, bobot dari residual ts-tp relative terhadap residual tp (contoh. Wtsp=1. memberikan bobot yang sama untuk ts-tp dan tp, sedangkan wtsp<1 memberikan bobot ts-tp yang lebih kecil dari tp)
+* eigtol = singular value decomposition (SVD) cutoff dari penyesuaian hiposenter. Jika nilai terendah eigenvalue dari matrix Geiger < eigtol, maka perubahan kedalaman tidak akan disesuaikan dan catatan akan ditulis pada `fort.16`
+* rmscut = nilai dari RMS residual bawah yang mana jika nilai residual dibawah nilai RMS penyesuaian hiposenter akan dihentikan
+* zmin = kedalaman hiposenter minimum (nilai negative untuk elevasi diatas msl namun dibawah permukaan tanah). Diatur agar berada di atas stasiun tertinggi untuk menghindari “airquakes”.
+* dxmax = penyesuaian hiposenter secara horizontal yang diperbolehkan untuk tiap iterasi dalam km
+* rderr = estimasi dari error picking ( biasanya pada rentang 0.01-0.05s). Digunakan untuk mengestimasi error hiposenter.
+* ercof = untuk error perhitungan hypoinverse. Set 0.0<ercof<1.0 untuk memasukkan RMS residual pada estimasi error hiposenter
+
+__Baris ketiga__:
+* nhitct = DWS minimum untuk parameter yang dimasukkan kedalam inversi (biasanya ≥5)
+* dvpmx = penyesuaian vp maksimum yang diperbolehkan untuk tiap iterasi
+* dvsmx = penyesuaian vs maksimum yang diperbolehkan untuk tiap iterasi
+* idmp = 1 untuk menghitung ulang nilai damping tiap iterasi (adaptive damping), 0 untuk menjaga nilai damping tetap.
+* vpdamp = parameter damping vp pada inversi kecepatan
+* vsdamp = parameter damping vs pada inversi kecepatan
+* stadamp = parameter damping stasiun pada inversi kecepatan (delay stasiun)
+* stepl = step length (km) yang digunakan untuk menghitung turunan parsial sepanjang raypath
+
+__Baris keempat__:
+* ires = control perhitungan dari R dan C
+* i3d = “flag” untuk menggunakan raytracing pseudo-bending
+* nitmax = jumlah iterasi maksimum pada inversi kecepatan. Untuk menghitung hanya lokasi hiposenter set nitmax=0. Jika nitmax = -1, travel time sintetik dihitung berdasarkan raytracing yang digunakan pada input awal.
+* snrmct = nilai cutoff untuk solusi norm. simulp12 akan menghentikan iterasi jika nilai norm lebih kecil dari snrmct
+* ihomo = biasanya, ihomo=1 jika kecepatan awal dimulai dengan 1-D model dan ihomo=0 jika kecepatan awal yang digunakan 3-D.
+* rmstop = RMS global untuk menghentikan iterasi.
+* ifixl = jumlah inversi kecepatan untuk menjaga hiposenter tetap pada posisinya
+
+|ires| Hasil |
+|----|-------|
+|0| Tidak ada resolusi perhitungan|
+|1| Menghitung resolusi dan menghasilkan elemen diagonal.|
+|2| Output, ke `fort.17`, resolusi keseluruhan|
+|3| Menghitung resolusi pada iterasi pertama saja|
+
+|i3d| Hasil |
+|---|-------|
+|0| Tidak menggunakan pseudo-bending|
+|1| Menggunakan pseudo-bending hanya pada forward modeling untuk menghitung turunan parsial dari kecepatan|
+|2| Menggunakan pseudo-bending pada penentuan lokasi gempa|
+|3| Menggunakan pseudo-bending dengan mengabaikan curvature dibawah lapisan Moho|
+
+__Baris kelima__:
+* delt1, delt2 = bobot jarak episenter untuk semua bagian dalam inversi
+* res1, res2, res3 = pengaturan bobot sebagai fungsi dari residual. Nilai res1 dan res2 harus linear begitu pula dengan res2 dan res3. catatan: res3 harus diset sangat besar (contohnya 5)
+
+__Baris keenam__:
+* ndip = jumlah sudut rotasi (dari -90<sup>o</sup> sampai 90<sup>o</sup>) dari bidang yang mana ray akan mencari jalan tercepat.
+* iskip = jumlah dari sudut rotasi yang dihidari (skip) baik secara horizontal maupun vertikal. Contoh: ndip=9 dan iskip=3 melewatkan 1 bidang vertikal dan 2 horizontal pada sudut 22.5<sup>o</sup>. 
+* scale1 = mengatur panjangnya perubahan tiap iterasi saat perhitungan travel time (km). Atur sedemikian hingga tidak lebih besar dari spasi grid nodes terkecil.
+* scale2 = skala (dalam km) untuk jumlah jalan yang dilewati oleh raytracing (interval antara pembengkokkan dalam ray). Jika nilai scale2 kecil, maka jumlah kemungkinan raypath yang dilewati makin besar konsekuensinya waktu pemrosesan data menjadi lebih lama
+
+__Baris ketujuh__:
+* xfac = perbaikan faktor kekonvergenan untuk pseudo-bending. Nilai yang disarankan 1.2≤xfact≤1.5
+* tlim = perbedaan traveltime yang digunakan untuk menghentikan perhitungan (gunakan 0.0005≤tlim ≤0,002s)
+* nitpb = jumlah maksimum dari iterasi yang diperbolehkan untuk pseudo-bending (gunakan antara 5-10).
+
+__Baris kedelapan__:
+* iusep = 1 untuk menginversi tp ke vp. 0 untuk mencegah inversi vp
+* iuses = 1 untuk menginversi ts-tp ke vp/vs. 0 untuk mencegah inversi vp/vs
+* invdelay = 1 untuk menginversi ke delay stasiun. 0 untuk mencegahnya
+
+### Menjalankan program `simulps12.f`
+Sebelum mulai menjalankan program (*compiling*), terlebih dahulu pastikan semua file input (`control.dat`, `velocity.dat`, `earthq.dat`, `stations.dat`, `simulps12.f`, `simulps_common.inc`, dan `velfile.33tq1c`) berada pada 1 folder yang sama.
+
+Compile semua file menjadi 1 (dapat dioperasikan pada ubuntu 16.04 dengan gfortran, gcc 5.4.0).
+{%highlight bash%}
+~/path/to/file/ gfortran -std=legacy simulps12.f -o out.file
+{% endhighlight %}
+Setelah semua file tersebut ter-compile maka jalankanlah file eksekusi `out.file`
+{% highlight bash %}
+~/path/to/file/ ./out.file
+{% endhighlight %}
+Jika program telah selesai melakukan perhitungan, hasil relokasi hiposenter dan inversi kecepatan dapat dilihat pada `fort.16` atau `fort.23` berturut-turut untuk selanjutnya dilakukan plotting.
+
+> Mohon maaf atas ketidak-rapian postingan ini. Akhir kata selamat mencoba, jika ada pertanyaan silahkan menghubungi hendrawan.palgunadi@gmail.com 
+
+
+[User-manual]: https://pubs.usgs.gov/of/1994/0431/report.pdf
+[Pyproj]: https://pypi.python.org/pypi/pyproj?
+[epsg]: http://spatialreference.org/ref/epsg/
