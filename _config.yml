@@ -6,7 +6,7 @@ markdown: kramdown
 highlighter: pygments
 logo: false
 paginate: 15
-baseurl: 'https://palgunadi1993.github.io'
+baseurl: /palgunadi1993.github.io
 domain_name: 'https://palgunadi1993.github.io'
 google_analytics: 'UA-XXXXXXXX-X'
 gems: [jekyll-paginate]
