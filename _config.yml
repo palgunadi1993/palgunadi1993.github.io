@@ -1,7 +1,9 @@
 name: Kadek Palgunadi's Blog
 description: Blogging about stuffs that I concern about
 meta_description: "My sharing knowledge pages, Blogging about stuffs"
-
+plugins:
+  - jekyll-seo-tag
+  
 markdown: kramdown
 highlighter: rouge
 logo: false
