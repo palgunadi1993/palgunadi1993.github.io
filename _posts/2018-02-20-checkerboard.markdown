@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "*Checkerboard* SIMULPS12 (Bahasa Indonesia)"
+title:  "Checkerboard SIMULPS12 (Bahasa Indonesia)"
 date:   2017-02-25 00:00:00
 categories: software manual
 ---
