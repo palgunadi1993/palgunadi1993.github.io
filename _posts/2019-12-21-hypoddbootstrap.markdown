@@ -7,7 +7,7 @@ categories: software manual
 
 Setelah melakukan relokasi hiposenter dengan menggunakan teknik *double-difference* akankah lebih baik jika mencantumkan error 3D (x , y, z). Secara umum error dari lokasi ini direpresentasikan dengan 3D elips. Namun, *uncertainty* spasial dari hiposenter tidak dapat diperoleh secara langsung dari output hypoDD. Untuk mendapatkan spasial error hanya dapat dihitung secara statistik. Terdapat berbagai jenis analisis statistik yang dapat dilakukan, salah satunya adalah metode 'bootstrap'. Pada tutorial kali ini, saya hanya akan membahas metode statistik bootstrap untuk mengidenditifikasi spatial error dari hasil relokasi mengunggunakan teknik *double-difference*. 
 
-Sebelumnya, jika ingin menggunakan metode ini pada relokasi hypoDD, jangan lupa untuk mensitasi "Supendi, P., Nugraha, A.D., Widiyantoro, S. et al. Geosci. Lett. (2019) 6: 18. https://doi.org/10.1186/s40562-019-0148-9". Terima kasih.
+Sebelumnya, jika ingin menggunakan metode ini pada relokasi hypoDD, jangan lupa untuk mensitasi "Supendi, P., Nugraha, A.D., Widiyantoro, S. et al. Geosci. Lett. (2019) 6: 18. https://doi.org/10.1186/s40562-019-0148-9" [link[paper]]. Terima kasih.
 
 Teori dasar tentang metode ini telah dijelaskan pada paper tersebut diatas. Disini, saya akan lebih membahas secara teknis. Sebelum menjalankan script berikut, pastikan dahulu anda telah memiliki program hypoDD yang dapat di download secara gratis di website USGS. 
 
@@ -207,4 +207,5 @@ Sekian tutorial kali ini, semoga bermanfaat.
 
 > Jika ada pertanyaan silahkan ajukan ke saya -> hendrawan.palgunadi@gmail.com
 
-Terima kasih.
+Terima kasih
+[paper]: https://www.researchgate.net/publication/337947322_Hypocenter_relocation_of_the_aftershocks_of_the_Mw_75_Palu_earthquake_September_28_2018_and_swarm_earthquakes_of_Mamasa_Sulawesi_Indonesia_using_the_BMKG_network_data
