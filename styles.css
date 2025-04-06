@@ -604,13 +604,22 @@ footer {
   }
 }
 
-/* Graphical Abstract Styles */
-.graphical-abstract {
-  margin: 15px 0;
-  border-radius: var(--border-radius);
+/* Container for the graphical abstract with controlled visibility */
+.graphical-abstract-container {
+  height: 0;
   overflow: hidden;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  transition: height 0.5s ease, opacity 0.5s ease, margin 0.5s ease, padding 0.5s ease;
+}
+
+/* The actual graphical abstract content */
+.graphical-abstract {
   border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   background-color: rgba(0, 0, 0, 0.02);
+  overflow: hidden;
   transition: transform var(--transition-time), box-shadow var(--transition-time);
 }
 
@@ -621,9 +630,9 @@ footer {
 
 .graphical-abstract img {
   width: 100%;
-  max-height: 300px;
-  object-fit: contain;
   display: block;
+  object-fit: contain;
+  max-height: 400px; /* Increase this if your images need more height */
   background-color: white;
 }
 
@@ -636,37 +645,48 @@ footer {
   border-top: 1px solid var(--border-color);
 }
 
-/* For dark theme */
+/* Dark theme adjustments */
 .dark-theme .graphical-abstract {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Responsive adjustments */
-@media (min-width: 768px) {
-  .graphical-abstract {
-    max-width: 80%;
-    margin-left: 0;
-  }
+/* Hidden checkbox for toggle control */
+.abstract-toggle-input {
+  display: none;
 }
 
-/* Optional: Make the abstracts toggleable */
-.abstract-toggle {
+/* Label styling */
+.abstract-toggle-label {
   display: inline-block;
-  margin-top: 10px;
+  margin: 10px 0;
   cursor: pointer;
   color: var(--accent-color);
   font-weight: 500;
 }
 
-.abstract-toggle i {
+.abstract-toggle-label i {
   margin-left: 5px;
-  transition: transform var(--transition-time);
+  transition: transform 0.3s;
 }
 
-.abstract-toggle:hover i {
-  transform: translateY(-2px);
+/* When checkbox is checked, show the abstract */
+.abstract-toggle-input:checked + .abstract-toggle-label + .graphical-abstract-container {
+  height: auto;
+  opacity: 1;
+  margin: 15px 0;
+  padding: 0;
 }
 
-.hidden-abstract {
-  display: none;
+/* Rotate the icon when expanded */
+.abstract-toggle-input:checked + .abstract-toggle-label i {
+  transform: rotate(180deg);
+}
+
+/* Change label text using ::after pseudo-element */
+.abstract-toggle-label::after {
+  content: "Show graphical abstract";
+}
+
+.abstract-toggle-input:checked + .abstract-toggle-label::after {
+  content: "Hide graphical abstract";
 }
