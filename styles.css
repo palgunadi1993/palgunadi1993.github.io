@@ -603,3 +603,70 @@ footer {
     font-size: 1.25rem;
   }
 }
+
+/* Graphical Abstract Styles */
+.graphical-abstract {
+  margin: 15px 0;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.02);
+  transition: transform var(--transition-time), box-shadow var(--transition-time);
+}
+
+.graphical-abstract:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px var(--shadow-color);
+}
+
+.graphical-abstract img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+  background-color: white;
+}
+
+.abstract-caption {
+  padding: 10px;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+}
+
+/* For dark theme */
+.dark-theme .graphical-abstract {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .graphical-abstract {
+    max-width: 80%;
+    margin-left: 0;
+  }
+}
+
+/* Optional: Make the abstracts toggleable */
+.abstract-toggle {
+  display: inline-block;
+  margin-top: 10px;
+  cursor: pointer;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.abstract-toggle i {
+  margin-left: 5px;
+  transition: transform var(--transition-time);
+}
+
+.abstract-toggle:hover i {
+  transform: translateY(-2px);
+}
+
+.hidden-abstract {
+  display: none;
+}

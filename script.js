@@ -55,6 +55,24 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Toggle graphical abstracts
+  const abstractToggles = document.querySelectorAll('.abstract-toggle');
+  
+  abstractToggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+      const pubItem = this.closest('.publication-item');
+      const abstract = pubItem.querySelector('.graphical-abstract');
+      
+      if (abstract.classList.contains('hidden-abstract')) {
+        abstract.classList.remove('hidden-abstract');
+        this.innerHTML = 'Hide graphical abstract <i class="fas fa-chevron-up"></i>';
+      } else {
+        abstract.classList.add('hidden-abstract');
+        this.innerHTML = 'Show graphical abstract <i class="fas fa-chevron-down"></i>';
+      }
+    });
+  });
   
   // Handle contact form submission if it exists
   const contactForm = document.querySelector('.contact-form');
